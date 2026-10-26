@@ -22,6 +22,24 @@ function getCsrfToken() {
     return meta ? meta.getAttribute("content") : "";
 }
 
+// Global SDN Priority Notification Toast dismiss handler
+function closeSdnPriorityToast(e) {
+    if (e) {
+        if (typeof e.stopPropagation === "function") e.stopPropagation();
+        if (typeof e.preventDefault === "function") e.preventDefault();
+    }
+    const toast = document.getElementById("sdnGlobalToast");
+    if (!toast) return;
+    if (window._sdnToastTimeout) {
+        clearTimeout(window._sdnToastTimeout);
+        window._sdnToastTimeout = null;
+    }
+    toast.classList.remove("translate-x-0", "opacity-100", "pointer-events-auto");
+    toast.classList.add("translate-x-full", "opacity-0", "pointer-events-none");
+}
+window.closeSdnPriorityToast = closeSdnPriorityToast;
+
+
 // ==========================================
 // CLINICAL AUDIO ALARM SYNTHESIZER (WEB AUDIO API)
 // ==========================================
@@ -165,7 +183,11 @@ function initGlobalAudioMute() {
 
     // Background global alert surveillance across all dashboard pages
     let lastSeenAlertId = null;
-    let toastTimeout = null;
+
+    const closeToastBtn = document.getElementById("closeToastBtn");
+    if (closeToastBtn) {
+        closeToastBtn.addEventListener("click", closeSdnPriorityToast);
+    }
 
     function showSdnPriorityToast(alertData) {
         const toast = document.getElementById("sdnGlobalToast");
@@ -183,10 +205,9 @@ function initGlobalAudioMute() {
         toast.classList.remove("translate-x-full", "opacity-0", "pointer-events-none");
         toast.classList.add("translate-x-0", "opacity-100", "pointer-events-auto");
 
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
-            toast.classList.remove("translate-x-0", "opacity-100", "pointer-events-auto");
-            toast.classList.add("translate-x-full", "opacity-0", "pointer-events-none");
+        if (window._sdnToastTimeout) clearTimeout(window._sdnToastTimeout);
+        window._sdnToastTimeout = setTimeout(() => {
+            closeSdnPriorityToast();
         }, 5000);
     }
 
