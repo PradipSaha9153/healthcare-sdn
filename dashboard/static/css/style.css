@@ -167,3 +167,37 @@ body {
   border-color: #06B6D4;
   box-shadow: 0 0 0 1px #06B6D4;
 }
+
+/* Single-Screen Clinical Workstation Layout (No Scrolling) */
+@media (min-width: 1024px) {
+  body[data-page="live"] {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  body[data-page="live"] main {
+    padding: 0.5rem 1rem !important;
+    height: calc(100vh - 120px) !important;
+    max-height: calc(100vh - 120px) !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body[data-page="live"] footer {
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+}
+
+@media (max-height: 680px) and (min-width: 1024px) {
+  body[data-page="live"] {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+  body[data-page="live"] main {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

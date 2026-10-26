@@ -86,9 +86,9 @@ function playCriticalAlarm() {
 
     // High urgency clinical burst: C6 (1046Hz), A5 (880Hz), F5 (698Hz), A5 (880Hz), C6 (1046Hz)
     playTone(1046, 0.12, "triangle", 0.38, 0.00);
-    playTone(880,  0.12, "triangle", 0.34, 0.16);
-    playTone(698,  0.14, "triangle", 0.32, 0.32);
-    playTone(880,  0.12, "triangle", 0.34, 0.52);
+    playTone(880, 0.12, "triangle", 0.34, 0.16);
+    playTone(698, 0.14, "triangle", 0.32, 0.32);
+    playTone(880, 0.12, "triangle", 0.34, 0.52);
     playTone(1046, 0.18, "triangle", 0.38, 0.68);
 
     flashAudioButton("critical");
@@ -172,7 +172,7 @@ function initGlobalAudioMute() {
         if (!toast) return;
         const msgEl = document.getElementById("toastAlertMessage");
         const patientEl = document.getElementById("toastPatientId");
-        
+
         if (msgEl) {
             msgEl.textContent = alertData.message || alertData.title || "Emergency QoS rerouting triggered: Traffic steered to guaranteed 6-10 Mbps Linux HTB Queue 1.";
         }
@@ -203,7 +203,7 @@ function initGlobalAudioMute() {
             if (navBadge) {
                 const total = critCount + warnCount;
                 navBadge.textContent = total > 0 ? total : "0";
-                navBadge.className = total > 0 
+                navBadge.className = total > 0
                     ? "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white font-mono animate-pulse"
                     : "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 font-mono";
             }
@@ -317,6 +317,8 @@ function initLiveMonitor() {
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
+    setTimeout(resizeCanvas, 60);
+    setTimeout(resizeCanvas, 250);
 
     // High-Fidelity Clinical Lead-II Physiological Waveform Generator
     function getPhysiologicalECGSample(phase, isArrhythmia, hr, currentBeat) {
@@ -492,11 +494,11 @@ function initLiveMonitor() {
             if (valHr) {
                 valHr.textContent = Math.round(targetHr);
                 if (isTachycardia) {
-                    valHr.className = "text-4xl lg:text-5xl font-mono font-extrabold text-rose-500 tracking-tight animate-pulse";
+                    valHr.className = "text-3xl xl:text-4xl font-mono font-extrabold text-rose-500 tracking-tight animate-pulse";
                 } else if (isBradycardia) {
-                    valHr.className = "text-4xl lg:text-5xl font-mono font-extrabold text-amber-400 tracking-tight animate-pulse";
+                    valHr.className = "text-3xl xl:text-4xl font-mono font-extrabold text-amber-400 tracking-tight animate-pulse";
                 } else {
-                    valHr.className = "text-4xl lg:text-5xl font-mono font-extrabold text-white tracking-tight";
+                    valHr.className = "text-3xl xl:text-4xl font-mono font-extrabold text-white tracking-tight";
                 }
             }
             const lblHrRange = document.getElementById("lbl-hr-range");
@@ -753,7 +755,7 @@ function initAlertsPage() {
         if (navBadge) {
             const unacked = critCount + warnCount;
             navBadge.textContent = unacked > 0 ? unacked : "0";
-            navBadge.className = unacked > 0 
+            navBadge.className = unacked > 0
                 ? "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white font-mono animate-pulse"
                 : "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 font-mono";
         }
@@ -923,8 +925,8 @@ function initAlertsPage() {
         const cardTemp = document.getElementById("inspCardTemp");
 
         if (cardHR) {
-            cardHR.className = isHrBreach 
-                ? "bg-slate-950 p-3 rounded-lg border border-rose-500/60 shadow-[0_0_10px_rgba(244,63,94,0.2)] space-y-1" 
+            cardHR.className = isHrBreach
+                ? "bg-slate-950 p-3 rounded-lg border border-rose-500/60 shadow-[0_0_10px_rgba(244,63,94,0.2)] space-y-1"
                 : "bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1";
         }
         if (inspValHR) {
@@ -937,8 +939,8 @@ function initAlertsPage() {
         }
 
         if (cardSpO2) {
-            cardSpO2.className = isSpo2Breach 
-                ? "bg-slate-950 p-3 rounded-lg border border-rose-500/60 shadow-[0_0_10px_rgba(244,63,94,0.2)] space-y-1" 
+            cardSpO2.className = isSpo2Breach
+                ? "bg-slate-950 p-3 rounded-lg border border-rose-500/60 shadow-[0_0_10px_rgba(244,63,94,0.2)] space-y-1"
                 : "bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1";
         }
         if (inspValSpO2) {
@@ -955,8 +957,8 @@ function initAlertsPage() {
         if (inspNoteMAP) inspNoteMAP.textContent = `MAP: ${sel.map || 88} mmHg`;
 
         if (cardTemp) {
-            cardTemp.className = isTempBreach 
-                ? "bg-slate-950 p-3 rounded-lg border border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)] space-y-1" 
+            cardTemp.className = isTempBreach
+                ? "bg-slate-950 p-3 rounded-lg border border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)] space-y-1"
                 : "bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1";
         }
         if (inspValTemp) {
@@ -1030,7 +1032,7 @@ function initAlertsPage() {
     }
 
     // Acknowledge a single alert
-    window.acknowledgeAlert = async function(alertId) {
+    window.acknowledgeAlert = async function (alertId) {
         try {
             const res = await fetch(`/api/alerts/${alertId}/ack`, {
                 method: "POST",
