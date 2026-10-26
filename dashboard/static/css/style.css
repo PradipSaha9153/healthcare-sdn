@@ -118,7 +118,7 @@ body {
   padding: 0;
   background-color: #070B12;
   color: #F8FAFC;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Table styling for clinical alerts and flow events */

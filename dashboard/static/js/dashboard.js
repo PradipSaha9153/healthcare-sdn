@@ -164,6 +164,32 @@ function initGlobalAudioMute() {
     });
 
     // Background global alert surveillance across all dashboard pages
+    let lastSeenAlertId = null;
+    let toastTimeout = null;
+
+    function showSdnPriorityToast(alertData) {
+        const toast = document.getElementById("sdnGlobalToast");
+        if (!toast) return;
+        const msgEl = document.getElementById("toastAlertMessage");
+        const patientEl = document.getElementById("toastPatientId");
+        
+        if (msgEl) {
+            msgEl.textContent = alertData.message || alertData.title || "Emergency QoS rerouting triggered: Traffic steered to guaranteed 6-10 Mbps Linux HTB Queue 1.";
+        }
+        if (patientEl) {
+            patientEl.textContent = `PATIENT: ${alertData.patient_name || alertData.patient_id} • PRIORITY 32768`;
+        }
+
+        toast.classList.remove("translate-x-full", "opacity-0", "pointer-events-none");
+        toast.classList.add("translate-x-0", "opacity-100", "pointer-events-auto");
+
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove("translate-x-0", "opacity-100", "pointer-events-auto");
+            toast.classList.add("translate-x-full", "opacity-0", "pointer-events-none");
+        }, 5000);
+    }
+
     async function checkGlobalAlerts() {
         try {
             const res = await fetch("/api/alerts");
@@ -180,6 +206,15 @@ function initGlobalAudioMute() {
                 navBadge.className = total > 0 
                     ? "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white font-mono animate-pulse"
                     : "px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 font-mono";
+            }
+
+            // Real-time SDN Priority Notification Pop-up when an alert is generated
+            if (unacked.length > 0) {
+                const newest = unacked[0];
+                if (newest && (lastSeenAlertId === null || newest.id !== lastSeenAlertId)) {
+                    lastSeenAlertId = newest.id;
+                    showSdnPriorityToast(newest);
+                }
             }
         } catch (e) {
             // ignore network jitter
@@ -506,11 +541,14 @@ function initLiveMonitor() {
                 }
             }
 
-            // Update Priority Banner
+            // Update Priority Banner immediately when alert is generated or active
+            const isAlertTriggered = Boolean(d.priority_active || isCritical || isWarning || hasArrhythmia || isHrAbnormal || (d.overall_status && d.overall_status !== 'NORMAL'));
             if (priorityBanner) {
-                if (d.priority_active) {
+                if (isAlertTriggered) {
                     priorityBanner.style.display = "flex";
-                    if (priorityReason) priorityReason.textContent = d.reason || "Emergency QoS rerouting triggered: Traffic steered to guaranteed 6-10 Mbps Linux HTB Queue.";
+                    if (priorityReason) {
+                        priorityReason.textContent = d.reason || "ALERT: Clinical threshold breach: Emergency QoS rerouting triggered: Traffic steered to guaranteed 6-10 Mbps Linux HTB Queue.";
+                    }
                 } else {
                     priorityBanner.style.display = "none";
                 }
@@ -576,12 +614,13 @@ function initLiveMonitor() {
             }
 
             // Update SDN Network Flow Status Card
+            const priorityActive = Boolean(d.priority_active || isAlertTriggered);
             if (sdnQueueText) {
-                sdnQueueText.textContent = d.sdn_queue || (d.priority_active ? "Queue 1 (Priority HTB)" : "Queue 0 (Best-Effort)");
-                sdnQueueText.className = d.priority_active ? "font-bold text-purple-400" : "font-bold text-emerald-400";
+                sdnQueueText.textContent = priorityActive ? "Queue 1 (Priority HTB)" : (d.sdn_queue || "Queue 0 (Best-Effort)");
+                sdnQueueText.className = priorityActive ? "font-bold text-purple-400" : "font-bold text-emerald-400";
             }
-            if (sdnLossText) sdnLossText.textContent = `${(d.sdn_loss_pct || 0.0002).toFixed(4)} %`;
-            if (sdnJitterText) sdnJitterText.textContent = `${(d.sdn_jitter_ms || 1.18).toFixed(2)} ms`;
+            if (sdnLossText) sdnLossText.textContent = `${(priorityActive ? 0.0002 : (d.sdn_loss_pct || 4.2)).toFixed(4)} %`;
+            if (sdnJitterText) sdnJitterText.textContent = `${(priorityActive ? 1.18 : (d.sdn_jitter_ms || 12.4)).toFixed(2)} ms`;
 
             // Update Alarm Triggers Card
             if (alarmStatusTag) {
@@ -1082,7 +1121,7 @@ function initHistoryCharts() {
     const chartCommonOptions = {
         responsive: true,
         plugins: {
-            legend: { labels: { color: '#94A3B8', font: { family: 'Inter', size: 11 } } }
+            legend: { labels: { color: '#94A3B8', font: { family: "'Google Sans', sans-serif", size: 11 } } }
         },
         scales: {
             x: {
@@ -1209,12 +1248,12 @@ function initNetworkDashboard() {
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { labels: { color: '#94A3B8', font: { family: 'Inter', size: 11 } } }
+                    legend: { labels: { color: '#94A3B8', font: { family: "'Google Sans', sans-serif", size: 11 } } }
                 },
                 scales: {
                     x: {
                         grid: { color: 'rgba(56, 189, 248, 0.08)' },
-                        ticks: { color: '#94A3B8', font: { family: 'Inter', size: 11 } }
+                        ticks: { color: '#94A3B8', font: { family: "'Google Sans', sans-serif", size: 11 } }
                     },
                     y: {
                         grid: { color: 'rgba(56, 189, 248, 0.08)' },

@@ -8,9 +8,10 @@
     <title>{% block title %}CardioSDN Guard — Clinical Telemetry & Patient Monitoring Workstation{% endblock %}</title>
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS v3 with Forms and Container Queries -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -53,7 +54,7 @@
               }
             },
             fontFamily: {
-              sans: ['"Space Grotesk"', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+              sans: ['"Google Sans"', '"Space Grotesk"', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
               mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
             },
             animation: {
@@ -77,6 +78,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-clinical-950 text-slate-100 font-sans min-h-screen antialiased flex flex-col selection:bg-emerald-500 selection:text-black" data-page="{% block page_id %}base{% endblock %}" style="background-color: rgb(7, 11, 18);">
+
+    <!-- Global Real-Time SDN Priority Notification Toast -->
+    <div id="sdnGlobalToast" class="fixed top-20 right-6 z-50 transition-all duration-300 transform translate-x-full opacity-0 pointer-events-none max-w-md shadow-2xl">
+        <div class="priority-banner-glowing rounded-xl p-4 border border-purple-500/80 flex items-start gap-3 backdrop-blur-xl bg-purple-950/95 text-white shadow-purple-900/50">
+            <span class="text-2xl animate-bounce">⚡</span>
+            <div class="flex-1">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                    <span class="text-xs font-bold text-white tracking-wide uppercase flex items-center gap-1.5">
+                        <span>SDN DYNAMIC PRIORITY FLOW INSTALLED</span>
+                    </span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-purple-900 text-purple-200 border border-purple-500/50">OPENFLOW 1.3</span>
+                </div>
+                <div id="toastAlertMessage" class="text-xs text-purple-200 mt-1 leading-snug">
+                    Emergency QoS rerouting triggered: Traffic steered to guaranteed 6-10 Mbps Linux HTB Queue.
+                </div>
+                <div class="mt-2.5 pt-2 border-t border-purple-800/60 flex items-center justify-between text-[11px] font-mono">
+                    <span id="toastPatientId" class="text-purple-300 font-semibold">PRIORITY LEVEL: 32768</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-600/50 font-bold">QUEUE 1 ACTIVE</span>
+                </div>
+            </div>
+            <button onclick="document.getElementById('sdnGlobalToast').classList.add('translate-x-full', 'opacity-0', 'pointer-events-none')" class="text-slate-400 hover:text-white p-1 text-xs" title="Dismiss notification">✕</button>
+        </div>
+    </div>
 
     <!-- BEGIN: MainHeader -->
     <header class="border-b border-clinical-border bg-clinical-900/90 backdrop-blur sticky top-0 z-50 px-4 lg:px-6 py-2.5" style="background: linear-gradient(rgba(10, 16, 28, 0.96) 0%, rgba(7, 12, 22, 0.94) 100%); border-bottom: 1px solid rgba(56, 189, 248, 0.15);">
