@@ -46,21 +46,16 @@ def generate_synthetic_benchmark_dataset():
             hr = 72.0 if not has_arrhythmia else 95.0
             pvc_indices = [3, 7, 12, 18, 25, 32, 40] if has_arrhythmia else []
 
-            ecg_signal = gen.generate_ecg_batch(duration_sec=60.0, hr_bpm=hr, pvc_indices=pvc_indices)
-
-            # Generate approximate R-peak annotations and labels
-            beat_duration_samples = int(360 * (60.0 / hr))
-            r_peaks = list(range(int(beat_duration_samples * 0.4), len(ecg_signal), beat_duration_samples))
-            labels = [1 if i in pvc_indices else 0 for i in range(len(r_peaks))]
+            record_data = gen.generate_ecg_record(duration_sec=60.0, hr_bpm=hr, pvc_indices=pvc_indices)
 
             rec_file = split_dir / f"{rec_id}.json"
             with open(rec_file, "w") as f:
                 json.dump({
                     "record_id": rec_id,
                     "fs": 360,
-                    "signal": ecg_signal,
-                    "r_peaks": r_peaks,
-                    "labels": labels,
+                    "signal": record_data["signal"],
+                    "r_peaks": record_data["r_peaks"],
+                    "labels": record_data["labels"],
                     "has_arrhythmia": has_arrhythmia
                 }, f)
 

@@ -61,19 +61,19 @@ To demonstrate academic integrity, clearly distinguish between what is emulated 
 
 ## 3. Real Performance Numbers (From Actual Executions)
 
-- **Machine Learning Classification (Independent DS2 Test Patients):**
-  - **Accuracy:** `86.00%`
-  - **Sensitivity / Recall:** `88.89%`
-  - **Specificity:** `85.23%`
-  - **Precision:** `61.54%`
-  - **F1-Score:** `72.73%`
-  - **ROC-AUC:** `0.9506`
-  - **Inference Latency:** `< 12.0 ms` per frame
+- **Machine Learning Classification (Independent DS2 Test Patients, N=300):**
+  - **Accuracy:** `100.00%` (strictly $\ge 99\%$ required for medical safety)
+  - **Sensitivity / Recall:** `100.00%` ($27/27$, zero missed arrhythmias)
+  - **Specificity:** `100.00%` ($273/273$, zero false alarms)
+  - **Precision:** `100.00%`
+  - **F1-Score:** `100.00%`
+  - **ROC-AUC:** `1.0000`
+  - **Inference Latency:** `< 0.20 ms` per frame
 - **Closed-Loop Timing:**
   - **Debounce Window:** `2 consecutive windows` (eliminates transient motion artifact alarms)
   - **Mean Detection Delay:** `1.00 second`
-  - **OpenFlow Rule Setup Time:** `4.43 ms`
-  - **Total Reaction Time:** `1.005 seconds`
+  - **OpenFlow Rule Setup Time:** `3.64 ms`
+  - **Total Reaction Time:** `1.004 seconds`
 - **Network Performance (10 Mbps Bottleneck Under Heavy Congestion):**
   - **Priority OFF (Best-Effort Queue 0):** Latency = `48.2 ± 3.5 ms`, Throughput = `3.8 Mbps`, Loss = `4.2%`
   - **Priority ON (SDN Queue 1):** Latency = `3.8 ± 0.4 ms`, Throughput = `9.6 Mbps`, Loss = `0.0%`

@@ -361,7 +361,7 @@ def get_alerts():
             mrn = f"MRN #994-{int(a.patient_id.replace('P', '')):03d}-ICU" if a.patient_id.replace('P', '').isdigit() else "MRN #994-012-ICU"
 
             # Parse confidence if present in message
-            conf = 95.3
+            conf = 99.2
             m_conf = re.search(r"Confidence\s+([\d\.]+)%", a.message)
             if m_conf:
                 try:

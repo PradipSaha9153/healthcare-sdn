@@ -34,7 +34,7 @@
   ],
   "train_samples": 480,
   "test_samples": 300,
-  "training_time_sec": 0.209,
+  "training_time_sec": 0.123,
   "classes": [
     "NORMAL",
     "ARRHYTHMIA"

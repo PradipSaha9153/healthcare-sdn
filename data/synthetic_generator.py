@@ -1,7 +1,7 @@
 # data/synthetic_generator.py - Physiological signal generator for 360Hz ECG and multi-parameter vitals
 import math
 import numpy as np
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 class SyntheticPhysiologicalGenerator:
     """Generates realistic synthetic 360Hz ECG waveforms and multi-parameter vital signs.
@@ -52,21 +52,60 @@ class SyntheticPhysiologicalGenerator:
 
         return ecg
 
-    def generate_ecg_batch(self, duration_sec: float, hr_bpm: float, pvc_indices: Optional[List[int]] = None) -> List[float]:
-        """Generates continuous ECG signal for the given duration in seconds at 360 Hz."""
+    def generate_ecg_record(
+        self,
+        duration_sec: float,
+        hr_bpm: float,
+        pvc_indices: Optional[List[int]] = None
+    ) -> Dict[str, Any]:
+        """Generates continuous ECG signal with precise sample-aligned R-peaks/QRS centers and beat labels.
+
+        Returns:
+            dict containing:
+                - 'signal': list of ECG amplitude values
+                - 'r_peaks': list of exact sample indices of QRS peaks/centers
+                - 'labels': list of beat-level classifications (0=normal, 1=PVC)
+                - 'has_arrhythmia': bool indicating presence of ectopic beats
+        """
         pvc_indices = pvc_indices or []
         samples_needed = int(self.fs * duration_sec)
         full_signal = []
         beat_idx = 0
+        r_peaks = []
+        labels = []
+        curr_sample = 0
 
         while len(full_signal) < samples_needed:
             is_pvc = beat_idx in pvc_indices
             effective_hr = hr_bpm * (1.35 if is_pvc else 1.0)
+            rr_sec = 60.0 / max(30.0, effective_hr)
+            num_samples = int(self.fs * rr_sec)
             beat = self.generate_ecg_beat(effective_hr, is_pvc=is_pvc)
+
+            # Precise location of the QRS center:
+            # NSR sharp positive R-wave at 0.40 * rr_sec
+            # PVC wide inverted QRS nadir at 0.35 * rr_sec
+            peak_offset = int((0.35 if is_pvc else 0.40) * num_samples)
+            qrs_sample = curr_sample + peak_offset
+            if qrs_sample < samples_needed:
+                r_peaks.append(qrs_sample)
+                labels.append(1 if is_pvc else 0)
+
             full_signal.extend(beat.tolist())
+            curr_sample += len(beat)
             beat_idx += 1
 
-        return [round(float(v), 4) for v in full_signal[:samples_needed]]
+        signal = [round(float(v), 4) for v in full_signal[:samples_needed]]
+        return {
+            "signal": signal,
+            "r_peaks": r_peaks,
+            "labels": labels,
+            "has_arrhythmia": len(pvc_indices) > 0
+        }
+
+    def generate_ecg_batch(self, duration_sec: float, hr_bpm: float, pvc_indices: Optional[List[int]] = None) -> List[float]:
+        """Generates continuous ECG signal for the given duration in seconds at 360 Hz."""
+        return self.generate_ecg_record(duration_sec, hr_bpm, pvc_indices)["signal"]
 
     def generate_vitals_frame(
         self,
